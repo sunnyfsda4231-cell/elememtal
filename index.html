@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Territory Auto Battler</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="main-menu" class="menu-screen">
+        <div class="title-container">
+            <h1 class="game-title">ELEMENTAL CLASH</h1>
+            <p class="subtitle">Auto-Battler Territory War</p>
+        </div>
+        <button id="btn-start-game" class="menu-btn primary-btn">시작하기</button>
+    </div>
+
+    <div id="mode-select" class="menu-screen hidden">
+        <h2>모드 선택</h2>
+        <div class="mode-buttons">
+            <button id="btn-spectate-mode-select" class="menu-btn">AI 대전 관전</button>
+            <button id="btn-custom-mode" class="menu-btn">커스텀 원소 참전 (4인)</button>
+        </div>
+        <button class="menu-btn btn-back" data-target="main-menu">돌아가기</button>
+    </div>
+
+    <div id="spectate-setup-screen" class="menu-screen hidden">
+        <h2>AI 관전 설정</h2>
+        <div class="input-group" style="width: 300px; margin-bottom: 30px;">
+            <label style="text-align:center; font-size: 20px; color: #ddd; margin-bottom: 15px;">참가 인원 (2~8명)</label>
+            <input type="number" id="ai-count" value="8" min="2" max="8" style="text-align: center; font-size: 40px; padding: 15px; height: auto; font-weight: bold; border-radius: 12px; background: #222; border: 2px solid #555; color: #fff;">
+        </div>
+        <div class="mode-buttons">
+            <button id="btn-start-spectate" class="menu-btn primary-btn">시작!</button>
+            <button class="menu-btn btn-back" data-target="mode-select">돌아가기</button>
+        </div>
+    </div>
+
+    <div id="creator-screen" class="menu-screen hidden">
+        <h2>나만의 원소 창조</h2>
+        <div class="creator-layout">
+            <div class="creator-left">
+                <div class="input-group">
+                    <label>원소 이름</label>
+                    <input type="text" id="custom-name" value="MY_ELEMENT" maxlength="10">
+                </div>
+                <div class="input-group">
+                    <label>원소 색상</label>
+                    <input type="color" id="custom-color" value="#ff0044">
+                </div>
+                <div class="stats-allocator">
+                    <h3>스탯 분배 (잔여 포인트: <span id="stat-points-left">0</span>)</h3>
+                    <div class="stat-row">
+                        <span>회전 속도</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="spin">-</button>
+                            <span class="stat-value" id="stat-val-spin">3</span>
+                            <button class="stat-btn stat-add" data-stat="spin">+</button>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <span>이동 속도</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="move">-</button>
+                            <span class="stat-value" id="stat-val-move">3</span>
+                            <button class="stat-btn stat-add" data-stat="move">+</button>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <span>데미지</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="damage">-</button>
+                            <span class="stat-value" id="stat-val-damage">3</span>
+                            <button class="stat-btn stat-add" data-stat="damage">+</button>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <span>무기 크기</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="size">-</button>
+                            <span class="stat-value" id="stat-val-size">3</span>
+                            <button class="stat-btn stat-add" data-stat="size">+</button>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <span>아이템 운</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="luck">-</button>
+                            <span class="stat-value" id="stat-val-luck">3</span>
+                            <button class="stat-btn stat-add" data-stat="luck">+</button>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <span>체력</span>
+                        <div class="stat-controls">
+                            <button class="stat-btn stat-sub" data-stat="health">-</button>
+                            <span class="stat-value" id="stat-val-health">3</span>
+                            <button class="stat-btn stat-add" data-stat="health">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="creator-right">
+                <h3>무기 디자인 (남은 픽셀: <span id="pixels-left">28</span>)</h3>
+                <p class="desc">정확히 28칸을 그려주세요. (위쪽이 무기의 '앞'부분이 됩니다 / 우클릭: 지우기)</p>
+                <div id="pixel-editor-grid"></div>
+            </div>
+        </div>
+        <div class="creator-actions">
+            <button class="menu-btn btn-back" data-target="mode-select">돌아가기</button>
+            <button id="btn-start-custom" class="menu-btn primary-btn" disabled>전투 시작!</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <header id="ui-header">
+            <div id="faction-ui-container" style="display: flex; width: 100%; justify-content: space-around; align-items: center; margin-bottom: 5px;">
+                <!-- Faction UIs will be injected here dynamically -->
+            </div>
+            <div id="speed-controls" style="display: flex; gap: 10px; align-items: center;">
+                <button class="speed-btn active" data-speed="1">x1</button>
+                <button class="speed-btn" data-speed="2">x2</button>
+                <button class="speed-btn" data-speed="4">x4</button>
+                <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.3); margin: 0 5px;"></div>
+                <button id="quick-restart-btn" class="speed-btn" style="background-color: rgba(255, 68, 68, 0.2); border-color: rgba(255, 68, 68, 0.5);">다시하기</button>
+            </div>
+        </header>
+        
+        <canvas id="game-canvas"></canvas>
+
+        <div id="game-over-overlay" class="hidden">
+            <h1 id="winner-text">Winner!</h1>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="restart-btn" class="primary-btn">다시하기</button>
+                <button id="home-btn" class="menu-btn">처음으로 돌아가기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load scripts sequentially since we are not using modules (file:// compatibility) -->
+    <script src="js/constants.js"></script>
+    <script src="js/SoundManager.js"></script>
+    <script src="js/Grid.js"></script>
+    <script src="js/Item.js"></script>
+    <script src="js/Unit.js"></script>
+    <script src="js/CollisionManager.js"></script>
+    <script src="js/Renderer.js"></script>
+    <script src="js/GameLoop.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
